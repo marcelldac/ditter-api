@@ -59,19 +59,68 @@ userRouter.get("/users", async (req, res) => {
   }
 });
 
-userRouter.get("/users:id", (req, res) => {
-  res.send("ler usuarios por id");
+userRouter.get("/users/:id", async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    const user = await prisma.user.findFirst({
+      where: {
+        id: {
+          equals: id,
+        },
+      },
+    });
+
+    if (user) {
+      res.json(user);
+    } else {
+      res.json({
+        error: "User Not Found.",
+      });
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: "Internal Server Error." });
+  } finally {
+    await prisma.$disconnect();
+  }
 });
 
-userRouter.patch("/users:id", (req, res) => {
-  res.send("atualizar um atributo do usuário");
+userRouter.patch("/users/:id", async (req, res) => {
+  const { id } = req.params;
+  const { email, password } = req.body;
+
+  try {
+    const user = await prisma.user.update({
+      where: {
+        id: id,
+      },
+      data: {
+        email,
+        password,
+      },
+    });
+
+    if (user) {
+      res.json(user);
+    } else {
+      res.json({
+        error: "User Not Found.",
+      });
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: "Internal Server Error." });
+  } finally {
+    await prisma.$disconnect();
+  }
 });
 
-userRouter.put("/users:id", (req, res) => {
+userRouter.put("/users/:id", (req, res) => {
   res.send("atualizar um usuário");
 });
 
-userRouter.delete("/users:id", (req, res) => {
+userRouter.delete("/users/:id", (req, res) => {
   res.send("deletar um usuário");
 });
 
