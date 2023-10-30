@@ -11,8 +11,6 @@ userRouter.use(express.json());
 userRouter.post("/users", async (req, res) => {
   const { email, password } = req.body;
 
-  console.log(email);
-
   const salt = await bcrypt.genSalt(10);
   const hashed = await bcrypt.hash(password, salt);
 
@@ -46,15 +44,15 @@ userRouter.post("/users", async (req, res) => {
 userRouter.get("/users", async (req, res) => {
   try {
     const read = await prisma.user.findMany();
-    if (!read) {
+    if (read.length === 0) {
       return res.json({
-        error: "There was an error during registration. Please try again.",
+        error: "Users not found",
       });
     } else {
-      return read;
+      res.json(read);
     }
   } catch (error) {
-    console.error("Error registering user:", error);
+    console.error("Erro:", error);
     return res.json({ error: "Internal server error." });
   } finally {
     await prisma.$disconnect();
