@@ -1,15 +1,15 @@
 import { PrismaClient } from "@prisma/client";
-import express from "express";
-import UserModel from "../models/user-model";
+import express, { Request, Response } from "express";
 import bcrypt from "bcrypt";
+import UserModel from "../models/user-model";
 
 const userRouter = express.Router();
 const prisma = new PrismaClient();
 
 userRouter.use(express.json());
 
-userRouter.post("/users", async (req, res) => {
-  const { email, password } = req.body;
+userRouter.post("/users", async (req: Request, res: Response) => {
+  const { email, password }: UserModel = req.body;
 
   const salt = await bcrypt.genSalt(10);
   const hashed = await bcrypt.hash(password, salt);
@@ -41,7 +41,7 @@ userRouter.post("/users", async (req, res) => {
   }
 });
 
-userRouter.get("/users", async (req, res) => {
+userRouter.get("/users", async (req: Request, res: Response) => {
   try {
     const read = await prisma.user.findMany();
     if (read.length === 0) {
@@ -59,7 +59,7 @@ userRouter.get("/users", async (req, res) => {
   }
 });
 
-userRouter.get("/users/:id", async (req, res) => {
+userRouter.get("/users/:id", async (req: Request, res: Response) => {
   const { id } = req.params;
 
   try {
@@ -86,9 +86,12 @@ userRouter.get("/users/:id", async (req, res) => {
   }
 });
 
-userRouter.patch("/users/:id", async (req, res) => {
+userRouter.put("/users/:id", async (req: Request, res: Response) => {
   const { id } = req.params;
-  const { email, password } = req.body;
+  const { email, password }: UserModel = req.body;
+
+  const salt = await bcrypt.genSalt(10);
+  const hashed = await bcrypt.hash(password, salt);
 
   try {
     const user = await prisma.user.update({
@@ -96,17 +99,17 @@ userRouter.patch("/users/:id", async (req, res) => {
         id: id,
       },
       data: {
-        email,
-        password,
+        email: email,
+        password: hashed,
       },
     });
 
-    if (user) {
-      res.json(user);
-    } else {
+    if (!user) {
       res.json({
         error: "User Not Found.",
       });
+    } else {
+      res.json(user);
     }
   } catch (error) {
     console.log(error);
@@ -116,12 +119,27 @@ userRouter.patch("/users/:id", async (req, res) => {
   }
 });
 
-userRouter.put("/users/:id", (req, res) => {
-  res.send("atualizar um usuário");
-});
+userRouter.delete("/users/:id", async (req: Request, res: Response) => {
+  const { id } = req.params;
 
-userRouter.delete("/users/:id", (req, res) => {
-  res.send("deletar um usuário");
+  try {
+    const user = await prisma.user.delete({
+      where: {
+        id: id,
+      },
+    });
+
+    if (!user) {
+      res.sendStatus(404);
+    }
+
+    return res.status(200).json({ message: "User deleted successfully" });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Internal Server Error" });
+  } finally {
+    await prisma.$disconnect();
+  }
 });
 
 export default userRouter;
