@@ -1,9 +1,9 @@
 FROM node:latest
 
 # Diretório de trabalho dentro do contêiner
-WORKDIR /app
+WORKDIR /usr/src/app
 
-COPY package*.json .
+COPY package*.json ./
 RUN npm install
 COPY . .
 EXPOSE 4000
