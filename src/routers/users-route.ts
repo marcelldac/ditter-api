@@ -23,17 +23,17 @@ userRouter.post("/users", async (req: Request, res: Response) => {
     });
 
     if (!register) {
-      return res.json({
+      return res.status(500).json({
         error: "There was an error during registration. Please try again.",
       });
     } else {
-      return res.json({
+      return res.status(201).json({
         message: "User successfully registered.",
       });
     }
   } catch (error) {
     console.error("Error registering user:", error);
-    return res.json({
+    return res.status(500).json({
       error: "Internal server error.",
     });
   } finally {
@@ -45,15 +45,15 @@ userRouter.get("/users", async (req: Request, res: Response) => {
   try {
     const read = await prisma.user.findMany();
     if (read.length === 0) {
-      return res.json({
+      return res.status(404).json({
         error: "Users not found",
       });
     } else {
-      res.json(read);
+      res.status(200).json(read);
     }
   } catch (error) {
     console.error("Erro:", error);
-    return res.json({ error: "Internal server error." });
+    return res.status(500).json({ error: "Internal server error." });
   } finally {
     await prisma.$disconnect();
   }
@@ -72,9 +72,9 @@ userRouter.get("/users/:id", async (req: Request, res: Response) => {
     });
 
     if (user) {
-      res.json(user);
+      res.status(200).json(user);
     } else {
-      res.json({
+      res.status(404).json({
         error: "User Not Found.",
       });
     }
@@ -105,11 +105,11 @@ userRouter.put("/users/:id", async (req: Request, res: Response) => {
     });
 
     if (!user) {
-      res.json({
+      res.status(404).json({
         error: "User Not Found.",
       });
     } else {
-      res.json(user);
+      res.status(200).json(user);
     }
   } catch (error) {
     console.log(error);
@@ -130,7 +130,7 @@ userRouter.delete("/users/:id", async (req: Request, res: Response) => {
     });
 
     if (!user) {
-      res.sendStatus(404);
+      res.status(404).json({ error: "User Not Found." });
     }
 
     return res.status(200).json({ message: "User deleted successfully" });
