@@ -1,6 +1,6 @@
 import express from "express";
 
-import userRouter from "./routers/users-route";
+import userRouter from "./routers/user-routes";
 
 const PORT = process.env.PORT || 4000;
 const HOSTNAME = process.env.HOSTNAME || "http://localhost";
