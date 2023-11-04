@@ -154,6 +154,7 @@ const getUserById = async (req: Request, res: Response) => {
  * response.
  */
 const updateUser = async (req: Request, res: Response) => {
+  /* TODO: Resolver bug de atualização com um unico elemento (patch) */
   const { id } = req.params;
   const { email, password }: UserModel = req.body;
 
