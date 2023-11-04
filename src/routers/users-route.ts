@@ -15,6 +15,16 @@ userRouter.post("/users", async (req: Request, res: Response) => {
   const hashed = await bcrypt.hash(password, salt);
 
   try {
+    const emailExists = await prisma.user.findFirst({
+      where: {
+        email,
+      },
+    });
+
+    if (emailExists) {
+      return res.status(500).json({ error: "Email already exists." });
+    }
+
     const register = await prisma.user.create({
       data: {
         email: email,
@@ -24,13 +34,13 @@ userRouter.post("/users", async (req: Request, res: Response) => {
 
     if (!register) {
       return res.status(500).json({
-        error: "There was an error during registration. Please try again.",
-      });
-    } else {
-      return res.status(201).json({
-        message: "User successfully registered.",
+        error: "Internal Server Error.",
       });
     }
+
+    return res.status(201).json({
+      message: "User successfully registered.",
+    });
   } catch (error) {
     console.error("Error registering user:", error);
     return res.status(500).json({
