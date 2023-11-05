@@ -1,6 +1,7 @@
 import express from "express";
 
 import userRouter from "./routers/user-routes";
+import loginRouter from "./routers/login-routes";
 
 const PORT = process.env.PORT || 4000;
 const HOSTNAME = process.env.HOSTNAME || "http://localhost";
@@ -14,6 +15,7 @@ app.use((req, res, next) => {
 });
 
 app.use("/api", userRouter);
+app.use("/api", loginRouter);
 
 app.listen(PORT, () => {
   console.log(`Running on ${HOSTNAME}:${PORT} `);
