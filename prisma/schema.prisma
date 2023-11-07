@@ -23,6 +23,8 @@ model Profile{
   id String @id @unique @default(uuid())
   name String
   gender String
+  bio String?
+  avatarUrl String?
   dateOfBirth DateTime
 
   userID String @unique
