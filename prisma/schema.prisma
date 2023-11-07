@@ -15,4 +15,16 @@ model User {
   email String @unique
   password String
   createdAt DateTime @default(now())
+  
+  profile Profile?
+}
+
+model Profile{
+  id String @id @unique @default(uuid())
+  name String
+  gender String
+  dateOfBirth DateTime
+
+  userID String @unique
+  user User @relation(fields: [userID], references: [id])
 }
