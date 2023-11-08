@@ -5,4 +5,7 @@ type ProfileModel = {
   bio?: string;
   avatar_url?: string;
   date_of_birth: Date;
+  user_id: string;
 };
+
+export default ProfileModel;
