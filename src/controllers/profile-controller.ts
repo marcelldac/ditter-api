@@ -1,6 +1,5 @@
 import { Request, Response } from "express";
 import { PrismaClient } from "@prisma/client";
-import bcrypt from "bcrypt";
 
 import ProfileModel from "../models/profile-model";
 
@@ -23,16 +22,23 @@ const prisma = new PrismaClient();
  */
 
 const createProfile = async (req: Request, res: Response) => {
-  const {
-    name,
-    gender,
-    bio,
-    avatar_url,
-    date_of_birth,
-    user_id,
-  }: ProfileModel = req.body;
+  const { id } = req.params;
+  const { name, gender, bio, avatar_url, date_of_birth }: ProfileModel =
+    req.body;
 
   try {
+    const profileExists = await prisma.profile.findFirst({
+      where: {
+        userID: id,
+      },
+    });
+
+    if (profileExists) {
+      return res
+        .status(500)
+        .json({ error: "This user already have a profile." });
+    }
+
     const create = await prisma.profile.create({
       data: {
         name,
@@ -40,7 +46,7 @@ const createProfile = async (req: Request, res: Response) => {
         bio,
         avatarUrl: avatar_url,
         dateOfBirth: date_of_birth,
-        userID: user_id,
+        userID: id,
       },
     });
 
@@ -82,7 +88,7 @@ const getProfiles = async (req: Request, res: Response) => {
   try {
     const profiles = await prisma.profile.findMany();
 
-    if (profiles.length === 0) {
+    if (!profiles) {
       return res.status(404).json({
         error: "Profiles not found",
       });
