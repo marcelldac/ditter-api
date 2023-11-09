@@ -81,7 +81,11 @@ const createUser = async (req: Request, res: Response) => {
  */
 const getUser = async (req: Request, res: Response) => {
   try {
-    const users = await prisma.user.findMany();
+    const users = await prisma.user.findMany({
+      include: {
+        profile: true,
+      },
+    });
 
     if (users.length === 0) {
       return res.status(404).json({
@@ -120,6 +124,9 @@ const getUserById = async (req: Request, res: Response) => {
         id: {
           equals: id,
         },
+      },
+      include: {
+        profile: true,
       },
     });
 
