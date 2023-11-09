@@ -12,9 +12,9 @@ const profileRouter = express.Router();
 profileRouter.use(express.json());
 
 profileRouter.get("/profiles", getProfiles);
-profileRouter.get("/profiles", getProfileById);
-profileRouter.post("/profiles", createProfile);
-profileRouter.put("/profiles", updateProfile);
-profileRouter.delete("/profiles", deleteProfile);
+profileRouter.get("/profiles/:id", getProfileById);
+profileRouter.post("/profiles/:id", createProfile);
+profileRouter.put("/profiles/:id", updateProfile);
+profileRouter.delete("/profiles/:id", deleteProfile);
 
 export default profileRouter;
