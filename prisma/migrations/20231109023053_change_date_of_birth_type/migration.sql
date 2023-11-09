@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "Profile" ALTER COLUMN "dateOfBirth" DROP NOT NULL,
+ALTER COLUMN "dateOfBirth" SET DATA TYPE TEXT;
