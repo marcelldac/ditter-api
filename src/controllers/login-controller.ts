@@ -7,7 +7,21 @@ import LoginModel from "../models/login-model";
 
 const prisma: PrismaClient = new PrismaClient();
 
-const authorization = async (req: Request, res: Response) => {
+//#region Login Authorization
+/**
+ * The function `authorization` is responsible for handling user login and generating a JWT token if
+ * the credentials are valid.
+ * @param {Request} req - The `req` parameter is an object that represents the HTTP request made to the
+ * server. It contains information such as the request headers, request body, request method, and
+ * request URL.
+ * @param {Response} res - The `res` parameter is an instance of the `Response` object from the
+ * Express.js framework. It represents the HTTP response that will be sent back to the client.
+ * @returns a response with a status code of 201 and a JSON object containing a token.
+ */
+const authorization = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
   //TODO: Resolver bug de geração de token mesmo se estiver com a senha errada.
   const { email, password }: LoginModel = req.body;
 
@@ -31,6 +45,7 @@ const authorization = async (req: Request, res: Response) => {
 
   return res.status(201).json({ token: jwtToken });
 };
+//#endregion
 
 const verification = (req: Request, res: Response, next: NextFunction) => {
   const authToken = req.headers["authorization"];
