@@ -23,11 +23,11 @@ const prisma = new PrismaClient();
 const createUser = async (req: Request, res: Response) => {
   const { email, password }: UserModel = req.body;
 
-  const salt = await bcrypt.genSalt(10);
-  const hashed = await bcrypt.hash(password, salt);
+  const salt: string = await bcrypt.genSalt(10);
+  const hashed: string = await bcrypt.hash(password, salt);
 
   try {
-    const emailExists = await prisma.user.findFirst({
+    const emailExists: UserModel | null = await prisma.user.findFirst({
       where: {
         email,
       },
@@ -39,9 +39,9 @@ const createUser = async (req: Request, res: Response) => {
       });
     }
 
-    const register = await prisma.user.create({
+    const register: UserModel = await prisma.user.create({
       data: {
-        email: email,
+        email,
         password: hashed,
       },
     });
@@ -55,13 +55,13 @@ const createUser = async (req: Request, res: Response) => {
     return res.status(201).json({
       message: "User successfully registered.",
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error registering user: ", error);
-    return res.status(500).json({
+    res.status(500).json({
       error: "Internal server error.",
     });
   } finally {
-    return await prisma.$disconnect();
+    await prisma.$disconnect();
   }
 };
 //#endregion
@@ -96,9 +96,9 @@ const getUsers = async (req: Request, res: Response) => {
     return res.status(200).json(users);
   } catch (error) {
     console.error("Error getting user: ", error);
-    return res.status(500).json({ error: "Internal server error." });
+    res.status(500).json({ error: "Internal server error." });
   } finally {
-    return await prisma.$disconnect();
+    await prisma.$disconnect();
   }
 };
 //#endregion
@@ -188,10 +188,10 @@ const updateUser = async (req: Request, res: Response) => {
     res.status(200).json(user);
   } catch (error) {
     console.log(error);
-    return res.status(500).json({ error: "Internal Server Error." });
+    res.status(500).json({ error: "Internal Server Error." });
   } finally {
     console.log("finally");
-    return await prisma.$disconnect();
+    await prisma.$disconnect();
   }
 };
 //#endregion
@@ -215,6 +215,18 @@ const deleteUser = async (req: Request, res: Response) => {
   const { id } = req.params;
 
   try {
+    const profile = await prisma.profile.findUnique({
+      where: {
+        userID: id,
+      },
+    });
+
+    if (profile) {
+      return res.status(400).json({
+        message: "This user have a created profile",
+      });
+    }
+
     const user = await prisma.user.delete({
       where: {
         id: id,
@@ -228,9 +240,9 @@ const deleteUser = async (req: Request, res: Response) => {
     return res.status(200).json({ message: "User deleted successfully" });
   } catch (error) {
     console.log(error);
-    return res.status(500).json({ message: "Internal Server Error" });
+    res.status(500).json({ message: "Internal Server Error" });
   } finally {
-    return await prisma.$disconnect();
+    await prisma.$disconnect();
   }
 };
 //#endregion
