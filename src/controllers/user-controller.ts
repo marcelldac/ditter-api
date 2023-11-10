@@ -79,7 +79,7 @@ const createUser = async (req: Request, res: Response) => {
  * "Users not found" is returned. Otherwise, a 200 status code with the `read` array (containing the
  * users) is returned.
  */
-const getUser = async (req: Request, res: Response) => {
+const getUsers = async (req: Request, res: Response) => {
   try {
     const users = await prisma.user.findMany({
       include: {
@@ -87,7 +87,7 @@ const getUser = async (req: Request, res: Response) => {
       },
     });
 
-    if (users.length === 0) {
+    if (!users) {
       return res.status(404).json({
         error: "Users not found",
       });
@@ -235,4 +235,4 @@ const deleteUser = async (req: Request, res: Response) => {
 };
 //#endregion
 
-export { createUser, getUser, getUserById, updateUser, deleteUser };
+export { createUser, getUsers, getUserById, updateUser, deleteUser };
