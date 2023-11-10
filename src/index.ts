@@ -4,6 +4,8 @@ import userRoutes from "./routes/user-routes";
 import loginRoutes from "./routes/login-routes";
 import profileRoutes from "./routes/profile-routes";
 
+import { verification } from "./controllers/login-controller";
+
 const PORT = process.env.PORT || 4000;
 const HOSTNAME = process.env.HOSTNAME || "http://localhost";
 const app = express();
@@ -15,9 +17,9 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use("/api", userRoutes);
 app.use("/api", loginRoutes);
-app.use("/api", profileRoutes);
+app.use("/api", userRoutes);
+app.use("/api", verification, profileRoutes);
 
 app.listen(PORT, () => {
   console.log(`Running on ${HOSTNAME}:${PORT} `);
