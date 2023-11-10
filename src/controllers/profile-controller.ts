@@ -6,7 +6,6 @@ import ProfileModel from "../models/profile-model";
 const prisma = new PrismaClient();
 
 //#region Create Profile
-
 /**
  * The function creates a user profile using the provided data and returns a success message if the
  * profile is successfully created.
@@ -40,10 +39,10 @@ const createProfile = async (req: Request, res: Response) => {
 
     const create = await prisma.profile.create({
       data: {
-        ...rest,
         avatarUrl: avatar_url,
         dateOfBirth: date_of_birth,
         userID: id,
+        ...rest,
       },
     });
 
@@ -56,13 +55,13 @@ const createProfile = async (req: Request, res: Response) => {
     return res.status(201).json({
       message: "Profile successfully created.",
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error registering user: ", error);
-    return res.status(500).json({
+    res.status(500).json({
       error: "Internal server error.",
     });
   } finally {
-    return await prisma.$disconnect();
+    await prisma.$disconnect();
   }
 };
 //#endregion
@@ -92,11 +91,11 @@ const getProfiles = async (req: Request, res: Response) => {
     }
 
     return res.status(200).json(profiles);
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error getting profiles: ", error);
-    return res.status(500).json({ error: "Internal server error." });
+    res.status(500).json({ error: "Internal server error." });
   } finally {
-    return await prisma.$disconnect();
+    await prisma.$disconnect();
   }
 };
 //#endregion
@@ -137,11 +136,11 @@ const getProfileById = async (req: Request, res: Response) => {
     }
 
     return res.status(200).json(profile);
-  } catch (error) {
+  } catch (error: any) {
     console.log(error);
-    return res.status(500).json({ error: "Internal Server Error." });
+    res.status(500).json({ error: "Internal Server Error." });
   } finally {
-    return await prisma.$disconnect();
+    await prisma.$disconnect();
   }
 };
 //#endregion
@@ -185,12 +184,12 @@ const updateProfile = async (req: Request, res: Response) => {
       });
     }
 
-    res.status(200).json(profile);
-  } catch (error) {
+    return res.status(200).json(profile);
+  } catch (error: any) {
     console.log(error);
-    return res.status(500).json({ error: "Internal Server Error." });
+    res.status(500).json({ error: "Internal Server Error." });
   } finally {
-    return await prisma.$disconnect();
+    await prisma.$disconnect();
   }
 };
 //#endregion
@@ -214,9 +213,9 @@ const deleteProfile = async (req: Request, res: Response) => {
     return res.status(200).json({ message: "Profile deleted successfully" });
   } catch (error) {
     console.log(error);
-    return res.status(500).json({ message: "Internal Server Error" });
+    res.status(500).json({ message: "Internal Server Error" });
   } finally {
-    return await prisma.$disconnect();
+    await prisma.$disconnect();
   }
 };
 //#endregion
