@@ -23,8 +23,7 @@ const prisma = new PrismaClient();
 
 const createProfile = async (req: Request, res: Response) => {
   const { id } = req.params;
-  const { name, gender, bio, avatar_url, date_of_birth }: ProfileModel =
-    req.body;
+  const { avatar_url, date_of_birth, ...rest }: ProfileModel = req.body;
 
   try {
     const profileExists = await prisma.profile.findFirst({
@@ -41,9 +40,7 @@ const createProfile = async (req: Request, res: Response) => {
 
     const create = await prisma.profile.create({
       data: {
-        name,
-        gender,
-        bio,
+        ...rest,
         avatarUrl: avatar_url,
         dateOfBirth: date_of_birth,
         userID: id,
@@ -166,14 +163,8 @@ const getProfileById = async (req: Request, res: Response) => {
 const updateProfile = async (req: Request, res: Response) => {
   /* TODO: Resolver bug de atualização com um unico elemento (patch) */
   const { id } = req.params;
-  const {
-    name,
-    gender,
-    bio,
-    avatar_url,
-    date_of_birth,
-    user_id,
-  }: ProfileModel = req.body;
+  const { avatar_url, date_of_birth, user_id, ...rest }: ProfileModel =
+    req.body;
 
   try {
     const profile = await prisma.profile.update({
@@ -181,9 +172,7 @@ const updateProfile = async (req: Request, res: Response) => {
         id: id,
       },
       data: {
-        name,
-        gender,
-        bio,
+        ...rest,
         avatarUrl: avatar_url,
         dateOfBirth: date_of_birth,
         userID: user_id,
