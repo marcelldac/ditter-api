@@ -1,8 +1,8 @@
 import express from "express";
 
-import userRouter from "./routers/user-routes";
-import loginRouter from "./routers/login-routes";
-import profileRouter from "./routers/profile-routes";
+import userRoutes from "./routes/user-routes";
+import loginRoutes from "./routes/login-routes";
+import profileRoutes from "./routes/profile-routes";
 
 const PORT = process.env.PORT || 4000;
 const HOSTNAME = process.env.HOSTNAME || "http://localhost";
@@ -15,9 +15,9 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use("/api", userRouter);
-app.use("/api", loginRouter);
-app.use("/api", profileRouter);
+app.use("/api", userRoutes);
+app.use("/api", loginRoutes);
+app.use("/api", profileRoutes);
 
 app.listen(PORT, () => {
   console.log(`Running on ${HOSTNAME}:${PORT} `);
