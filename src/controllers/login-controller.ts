@@ -1,35 +1,57 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import { PrismaClient } from "@prisma/client";
-import bcrypt from "bcrypt";
+import { compare } from "bcrypt";
+import jwt from "jsonwebtoken";
+
+import LoginModel from "../models/login-model";
 
 const prisma: PrismaClient = new PrismaClient();
 
-const login = async (req: Request, res: Response): Promise<void> => {
-  const { email, password }: { email: string; password: string } = req.body;
+const authorization = async (req: Request, res: Response) => {
+  //TODO: Resolver bug de geração de token mesmo se estiver com a senha errada.
+  const { email, password }: LoginModel = req.body;
 
-  const user = await prisma.user.findFirst({
+  const userExists = await prisma.user.findUnique({
     where: { email },
   });
 
-  if (!user) {
-    res.status(404).json({ error: "User not found" });
-    return;
+  if (!userExists) {
+    return res.status(401).json({ message: "Invalid credentials" });
   }
-  /* TODO: Resolver bug de senha (carregamento infinito se a senha estiver errada) */
-  bcrypt.compare(
-    password,
-    user.password,
-    (err: Error | undefined, result: Boolean) => {
-      if (err) {
-        res.status(401).json({ error: "Authentication failed" });
-        return;
-      }
-      if (result) {
-        res.status(200).json({ message: "Authenticated Successfully" });
-        return;
-      }
-    }
-  );
+
+  const isPasswordValid = compare(password, userExists.password);
+
+  if (!isPasswordValid) {
+    return res.status(401).json({ message: "Invalid credentials" });
+  }
+
+  const jwtToken = jwt.sign({ sub: userExists.id }, process.env.JWT_SECRET!, {
+    expiresIn: "1d",
+  });
+
+  return res.status(201).json({ token: jwtToken });
 };
 
-export { login };
+const verification = (req: Request, res: Response, next: NextFunction) => {
+  const authToken = req.headers["authorization"];
+
+  if (!authToken) {
+    return res.status(401).json({ message: "Token does not provided." });
+  }
+
+  const token = authToken?.split(" ")[1];
+
+  if (!token) {
+    return res.status(401).json({ message: "Invalid token." });
+  }
+
+  try {
+    jwt.verify(token, process.env.JWT_SECRET!);
+    next();
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ error });
+  }
+};
+
+export { authorization, verification };

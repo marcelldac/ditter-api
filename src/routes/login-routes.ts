@@ -1,11 +1,11 @@
 import express, { Router } from "express";
 
-import { login } from "../controllers/login-controller";
+import { authorization } from "../controllers/login-controller";
 
 const loginRouter: Router = express.Router();
 
 loginRouter.use(express.json());
 
-loginRouter.post("/login", login);
+loginRouter.post("/authorization", authorization);
 
 export default loginRouter;
