@@ -162,19 +162,18 @@ const getProfileById = async (req: Request, res: Response) => {
 const updateProfile = async (req: Request, res: Response) => {
   /* TODO: Resolver bug de atualização com um unico elemento (patch) */
   const { id } = req.params;
-  const { avatar_url, date_of_birth, user_id, ...rest }: ProfileModel =
-    req.body;
+  const { avatar_url, date_of_birth, user_id, ...rest } = req.body;
 
   try {
     const profile = await prisma.profile.update({
       where: {
-        id: id,
+        id,
       },
       data: {
-        ...rest,
         avatarUrl: avatar_url,
         dateOfBirth: date_of_birth,
         userID: user_id,
+        ...rest,
       },
     });
 
